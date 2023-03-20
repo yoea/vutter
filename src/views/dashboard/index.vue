@@ -1,6 +1,10 @@
 <template>
   <div class="dashboard-container">
-    <div class="dashboard-text">name: {{ name }}</div>
+    <h1>欢迎登录Yoea管理平台</h1>
+    <div class="dashboard-text">username: {{ name }}</div>
+    <div class="dashboard-text">nickname: {{ nickname }}</div>
+    <div class="dashboard-text">email: {{ email }}</div>
+    <div class="dashboard-text">motto: {{ motto }}</div>
   </div>
 </template>
 
@@ -11,7 +15,10 @@ export default {
   name: 'Dashboard',
   computed: {
     ...mapGetters([
-      'name'
+      'name',
+      'nickname',
+      'email',
+      'motto'
     ])
   }
 }

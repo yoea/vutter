@@ -1,28 +1,41 @@
 <template>
   <div class="navbar">
     <hamburger :is-active="sidebar.opened" class="hamburger-container" @toggleClick="toggleSideBar" />
-
     <breadcrumb class="breadcrumb-container" />
 
     <div class="right-menu">
       <el-dropdown class="avatar-container" trigger="click">
         <div class="avatar-wrapper">
-          <img :src="avatar+'?imageView2/1/w/80/h/80'" class="user-avatar">
+          <img  :size="40" :src="avatar+'?s=100'"  class="user-avatar">
         </div>
         <el-dropdown-menu slot="dropdown" class="user-dropdown">
-          <router-link to="/">
-            <el-dropdown-item>
-              Home
+          <el-dropdown-item disabled>
+            <router-link to="/">
+              {{ name }}
+            </router-link>
+          </el-dropdown-item>
+          <router-link to="/dashboard">
+            <el-dropdown-item icon="el-icon-odometer" divided>
+              控制台
             </el-dropdown-item>
           </router-link>
-          <a target="_blank" href="https://github.com/PanJiaChen/vue-admin-template/">
-            <el-dropdown-item>Github</el-dropdown-item>
+          <router-link to="/user/custom">
+            <el-dropdown-item icon="el-icon-user">
+              个人中心
+            </el-dropdown-item>
+          </router-link>
+          <a target="_blank" href="https://panjiachen.gitee.io/vue-element-admin-site/zh/">
+            <el-dropdown-item icon="el-icon-document">
+              参考文档
+            </el-dropdown-item>
           </a>
-          <a target="_blank" href="https://panjiachen.github.io/vue-element-admin-site/#/">
-            <el-dropdown-item>Docs</el-dropdown-item>
-          </a>
-          <el-dropdown-item divided @click.native="logout">
-            <span style="display:block;">Log Out</span>
+          <router-link to="/setting/system">
+            <el-dropdown-item icon="el-icon-setting">
+              系统设置
+            </el-dropdown-item>
+          </router-link>
+          <el-dropdown-item divided @click.native="logout" icon="el-icon-sunset">
+            退出登录
           </el-dropdown-item>
         </el-dropdown-menu>
       </el-dropdown>
@@ -43,7 +56,8 @@ export default {
   computed: {
     ...mapGetters([
       'sidebar',
-      'avatar'
+      'avatar',
+      'name'
     ])
   },
   methods: {

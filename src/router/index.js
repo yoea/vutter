@@ -51,110 +51,87 @@ export const constantRoutes = [
       path: 'dashboard',
       name: 'Dashboard',
       component: () => import('@/views/dashboard/index'),
-      meta: { title: 'Dashboard', icon: 'dashboard' }
+      meta: {title: '控制台', icon: 'dashboard'}
     }]
   },
-
+  // 书籍目录
   {
-    path: '/example',
+    path: '/book',
     component: Layout,
-    redirect: '/example/table',
-    name: 'Example',
-    meta: { title: 'Example', icon: 'el-icon-s-help' },
+    redirect: '/book/list',
+    name: 'Book',
+    meta: {title: '图书管理', icon: 'el-icon-notebook-1'},
     children: [
       {
-        path: 'table',
-        name: 'Table',
-        component: () => import('@/views/table/index'),
-        meta: { title: 'Table', icon: 'table' }
+        path: 'list',
+        name: 'BookList',
+        component: () => import('@/views/book/index'),
+        meta: {title: '图书列表', icon: 'el-icon-notebook-2'}
       },
       {
-        path: 'tree',
-        name: 'Tree',
-        component: () => import('@/views/tree/index'),
-        meta: { title: 'Tree', icon: 'tree' }
+        path: 'review',
+        name: 'Review',
+        component: () => import('@/views/book/review'),
+        meta: {title: '书评管理', icon: 'el-icon-s-comment'}
       }
     ]
   },
-
+  // 用户
   {
-    path: '/form',
+    path: '/user',
     component: Layout,
+    redirect: '/user/userList',
+    name: 'User',
+    meta: {title: '用户管理', icon: 'el-icon-s-custom'},
     children: [
       {
-        path: 'index',
-        name: 'Form',
-        component: () => import('@/views/form/index'),
-        meta: { title: 'Form', icon: 'form' }
-      }
-    ]
+        path: 'userList',
+        name: 'UserList',
+        component: () => import('@/views/user/index'),
+        meta: {title: '用户列表', icon: 'el-icon-user-solid' }
+      },
+      {
+        path: 'info',
+        name: 'Info',
+        component: () => import('@/views/user/info'),
+        meta: { title: '个人中心', icon: 'el-icon-brush'}
+      } ]
   },
 
   {
-    path: '/nested',
+    path: '/setting',
     component: Layout,
-    redirect: '/nested/menu1',
-    name: 'Nested',
+    alwaysShow: true,
+    redirect: '/setting/system',
     meta: {
-      title: 'Nested',
-      icon: 'nested'
+      title: '设置',
+      icon: 'el-icon-setting',
+      roles: ['admin']
     },
     children: [
       {
-        path: 'menu1',
-        component: () => import('@/views/nested/menu1/index'), // Parent router-view
-        name: 'Menu1',
-        meta: { title: 'Menu1' },
-        children: [
-          {
-            path: 'menu1-1',
-            component: () => import('@/views/nested/menu1/menu1-1'),
-            name: 'Menu1-1',
-            meta: { title: 'Menu1-1' }
-          },
-          {
-            path: 'menu1-2',
-            component: () => import('@/views/nested/menu1/menu1-2'),
-            name: 'Menu1-2',
-            meta: { title: 'Menu1-2' },
-            children: [
-              {
-                path: 'menu1-2-1',
-                component: () => import('@/views/nested/menu1/menu1-2/menu1-2-1'),
-                name: 'Menu1-2-1',
-                meta: { title: 'Menu1-2-1' }
-              },
-              {
-                path: 'menu1-2-2',
-                component: () => import('@/views/nested/menu1/menu1-2/menu1-2-2'),
-                name: 'Menu1-2-2',
-                meta: { title: 'Menu1-2-2' }
-              }
-            ]
-          },
-          {
-            path: 'menu1-3',
-            component: () => import('@/views/nested/menu1/menu1-3'),
-            name: 'Menu1-3',
-            meta: { title: 'Menu1-3' }
-          }
-        ]
+        path: 'system',
+        name: 'System',
+        component: () => import('@/views/setting/system'),
+        meta: {title: '系统设置', icon: 'el-icon-s-tools'}
       },
       {
-        path: 'menu2',
-        component: () => import('@/views/nested/menu2/index'),
-        meta: { title: 'menu2' }
+        path: 'custom',
+        name: 'Custom',
+        component: () => import('@/views/setting/custom'),
+        meta: {title: '系统设置', icon: 'el-icon-s-tools'}
       }
     ]
   },
-
   {
-    path: 'external-link',
+    path: '尤恩主页',
     component: Layout,
+    hidden: false,
+    meta: {roles: ['admin']},
     children: [
       {
-        path: 'https://panjiachen.github.io/vue-element-admin-site/#/',
-        meta: { title: 'External Link', icon: 'link' }
+        path: 'https://www.ewing.top',
+        meta: {title: '尤恩主页', icon: 'link'}
       }
     ]
   },
