@@ -5,13 +5,11 @@
 
     <div class="right-menu">
       <el-dropdown class="avatar-container" trigger="click">
-        <div class="avatar-wrapper">
-          <img  :size="40" :src="avatar+'?s=100'"  class="user-avatar">
-        </div>
+        <div class="avatar-wrapper"><img sizes="40" :src="avatar+'?s=100'" class="user-avatar" alt="avatar"></div>
         <el-dropdown-menu slot="dropdown" class="user-dropdown">
           <el-dropdown-item disabled>
             <router-link to="/">
-              {{ name }}
+              {{ nickname }}
             </router-link>
           </el-dropdown-item>
           <router-link to="/dashboard">
@@ -19,7 +17,7 @@
               控制台
             </el-dropdown-item>
           </router-link>
-          <router-link to="/user/custom">
+          <router-link to="/user/info">
             <el-dropdown-item icon="el-icon-user">
               个人中心
             </el-dropdown-item>
@@ -57,7 +55,7 @@ export default {
     ...mapGetters([
       'sidebar',
       'avatar',
-      'name'
+      'nickname'
     ])
   },
   methods: {

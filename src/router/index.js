@@ -51,7 +51,7 @@ export const constantRoutes = [
       path: 'dashboard',
       name: 'Dashboard',
       component: () => import('@/views/dashboard/index'),
-      meta: {title: '控制台', icon: 'dashboard'}
+      meta: { title: '控制台', icon: 'dashboard' }
     }]
   },
   // 书籍目录
@@ -85,14 +85,14 @@ export const constantRoutes = [
     meta: {title: '用户管理', icon: 'el-icon-s-custom'},
     children: [
       {
-        path: 'userList',
+        path: 'list',
         name: 'UserList',
         component: () => import('@/views/user/index'),
         meta: {title: '用户列表', icon: 'el-icon-user-solid' }
       },
       {
         path: 'info',
-        name: 'Info',
+        name: 'UserInfo',
         component: () => import('@/views/user/info'),
         meta: { title: '个人中心', icon: 'el-icon-brush'}
       } ]
@@ -119,7 +119,7 @@ export const constantRoutes = [
         path: 'custom',
         name: 'Custom',
         component: () => import('@/views/setting/custom'),
-        meta: {title: '系统设置', icon: 'el-icon-s-tools'}
+        meta: { title: '自定义设置', icon: 'el-icon-s-tools'}
       }
     ]
   },

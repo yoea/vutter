@@ -1,6 +1,6 @@
 <template>
   <div class="app-container">
-    <h1>自定义设置</h1>
+    <h1>系统设置</h1>
   </div>
 </template>
 
