@@ -413,6 +413,8 @@ export default {
     },
     // 排序规则变化
     handleSortChange(column) {
+      this.pageDTO.currentPage = 1
+      window.sessionStorage.setItem('pagination_params', JSON.stringify(this.pageDTO))
       console.log(column)
       if (column.prop === 'id') {
         if (column.order === 'ascending') {
