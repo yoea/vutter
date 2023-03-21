@@ -16,6 +16,14 @@ export function logout(data) {
   })
 }
 
+export function userRegister(data) {
+  return request({
+    url: '/user/register',
+    method: 'post',
+    data
+  })
+}
+
 export function getInfo() {
   return request({
     url: '/user/info',

@@ -1,4 +1,4 @@
-import { login, logout, getInfo } from '@/api/user'
+import { login, logout, getInfo, userRegister } from '@/api/user'
 import { getToken, setToken, removeToken } from '@/utils/auth'
 import { resetRouter } from '@/router'
 
@@ -76,6 +76,21 @@ const actions = {
         commit('SET_MOTTO', motto)
 
         resolve(data)
+      }).catch(error => {
+        reject(error)
+      })
+    })
+  },
+
+  register({ commit }, userInfo) {
+    const { username, password, email } = userInfo
+    return new Promise((resolve, reject) => {
+      userRegister({ username: username.trim(), password: password, email: email }).then(response => {
+        console.log(response)
+        const { data } = response
+        console.log(data)
+        // todo:实现注册后自动登录
+        resolve()
       }).catch(error => {
         reject(error)
       })

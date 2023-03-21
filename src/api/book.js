@@ -15,6 +15,13 @@ export function deleteBook(params) {
   })
 }
 
+export function deleteBatchByIds(ids) {
+  return request({
+    url: '/book/delete/ids=' + ids,
+    method: 'delete'
+  })
+}
+
 export function getOne(params) {
   return request({
     url: '/book/get',

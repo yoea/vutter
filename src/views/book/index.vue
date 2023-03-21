@@ -25,23 +25,23 @@
         <!--            <el-dropdown-item command="advance" divided>高级导出</el-dropdown-item>-->
         <!--          </el-dropdown-menu>-->
         <!--        </el-dropdown>-->
-        <!--        <el-tooltip content="彻底删除" style="margin-left: 10px">-->
-        <!--          <el-button-->
-        <!--            plain-->
-        <!--            size="small"-->
-        <!--            type="warning"-->
-        <!--            icon="el-icon-delete"-->
-        <!--            @click="multipleDelete"-->
-        <!--          />-->
-        <!--        </el-tooltip>-->
-        <!--        <el-tooltip v-if="multipleSelection.length!==0" content="取消选择">-->
-        <!--          <el-button-->
-        <!--            plain-->
-        <!--            size="small"-->
-        <!--            icon="el-icon-document-checked"-->
-        <!--            @click="unSelectAll"-->
-        <!--          />-->
-        <!--        </el-tooltip>-->
+                <el-tooltip content="批量删除" style="margin-left: 10px">
+                  <el-button
+                    plain
+                    size="small"
+                    type="warning"
+                    icon="el-icon-delete"
+                    @click="multipleDelete"
+                  />
+                </el-tooltip>
+                <el-tooltip v-if="multipleSelection.length!==0" content="取消选择">
+                  <el-button
+                    plain
+                    size="small"
+                    icon="el-icon-document-checked"
+                    @click="unSelectAll"
+                  />
+                </el-tooltip>
       </el-col>
       <!--搜索-->
       <el-col :span="4" style="min-width: 250px">
@@ -233,7 +233,7 @@
 </template>
 
 <script>
-import { listBook, updateOrSave, deleteBook } from '@/api/book'
+import { listBook, updateOrSave, deleteBook, deleteBatchByIds } from '@/api/book'
 
 export default {
   name: 'Index',
@@ -481,7 +481,7 @@ export default {
         return null
       }
     },
-    // 逻辑删除书籍信息
+    // 删除单个书籍信息
     handleDelete(row) {
       this.listLoading = true
       this.params.id = row.id
@@ -496,35 +496,45 @@ export default {
         })
         this.fetchData()
       })
-    }
+    },
 
-    // // 彻底删除多个已选项
-    // multipleDelete() {
-    //   const arr = this.getSelectedId()
-    //   if (arr != null) {
-    //     this.$confirm('确定删除 ' + arr.length + ' 项吗？该操作不可撤销！', {
-    //       confirmButtonText: '确定',
-    //       type: 'warning',
-    //       callback: action => {
-    //         if (action === 'confirm') {
-    //           deleteBatchBooks(arr.toString()).then(res => {
-    //             this.$notify({
-    //               title: '操作成功',
-    //               message: res.data,
-    //               type: 'success'
-    //             })
-    //             this.unSelectAll()
-    //             this.fetchData()
-    //           })
-    //         }
-    //       }
-    //     })
-    //   } else {
-    //     this.$message({
-    //       message: '没有选定任何项目，删除失败。'
-    //     })
-    //   }
-    // }
+    // 处理按钮点击后不失去焦点的问题
+    clickHandler(evt) {
+      let target = evt.target
+      if (target.nodeName === 'SPAN') {
+        target = evt.target.parentNode
+      }
+      target.blur()
+    },
+
+    // 批量删除多个已选项
+    multipleDelete(e) {
+      const arr = this.getSelectedId()
+      this.clickHandler(e)
+      if (arr != null) {
+        this.$confirm('确定删除 ' + arr.length + ' 项吗？', {
+          confirmButtonText: '确定',
+          type: 'warning',
+          callback: action => {
+            if (action === 'confirm') {
+              deleteBatchByIds(arr.toString()).then(res => {
+                this.$notify({
+                  title: '操作成功',
+                  message: '此次共删除 ' + res.data + ' 条数据',
+                  type: 'success'
+                })
+                this.unSelectAll()
+                this.fetchData()
+              })
+            }
+          }
+        })
+      } else {
+        this.$message({
+          message: '没有选定任何项目，删除失败。'
+        })
+      }
+    }
   }
 }
 </script>
