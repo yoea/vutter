@@ -25,23 +25,23 @@
         <!--            <el-dropdown-item command="advance" divided>高级导出</el-dropdown-item>-->
         <!--          </el-dropdown-menu>-->
         <!--        </el-dropdown>-->
-                <el-tooltip content="批量删除" style="margin-left: 10px">
-                  <el-button
-                    plain
-                    size="small"
-                    type="warning"
-                    icon="el-icon-delete"
-                    @click="multipleDelete"
-                  />
-                </el-tooltip>
-                <el-tooltip v-if="multipleSelection.length!==0" content="取消选择">
-                  <el-button
-                    plain
-                    size="small"
-                    icon="el-icon-document-checked"
-                    @click="unSelectAll"
-                  />
-                </el-tooltip>
+        <el-tooltip content="批量删除" style="margin-left: 10px">
+          <el-button
+            plain
+            size="small"
+            type="warning"
+            icon="el-icon-delete"
+            @click="multipleDelete"
+          />
+        </el-tooltip>
+        <el-tooltip v-if="multipleSelection.length!==0" content="取消选择">
+          <el-button
+            plain
+            size="small"
+            icon="el-icon-document-checked"
+            @click="unSelectAll"
+          />
+        </el-tooltip>
       </el-col>
       <!--搜索-->
       <el-col :span="4" style="min-width: 250px">
@@ -54,7 +54,7 @@
           @clear="fetchData"
         >
           <template #append>
-            <el-button icon="el-icon-search" @click="fetchData"/>
+            <el-button icon="el-icon-search" @click="fetchData" />
           </template>
         </el-input>
       </el-col>
@@ -67,14 +67,13 @@
       :data="list"
       element-loading-text="正在加载图书列表..."
       highlight-current-row
-      height="565"
-      max-height="600"
+      :max-height="maxTableHeight"
       :cell-style="{padding:'9px 0 9px 0'}"
       row-key="id"
       @sort-change="handleSortChange"
       @selection-change="handleSelectionChange"
     >
-      <el-table-column type="selection" label="选择" :reserve-selection="true"/>
+      <el-table-column type="selection" label="选择" :reserve-selection="true" />
       <el-table-column label="编号" width="85" prop="id" sortable="custom" align="center">
         <template v-slot="scope">
           {{ scope.row.id }}
@@ -102,7 +101,7 @@
       </el-table-column>
       <el-table-column label="出版日期" align="center" width="110">
         <template v-slot="scope">
-          <i v-if="scope.row.publish_date!=null" class="el-icon-time"/>
+          <i v-if="scope.row.publish_date!=null" class="el-icon-time" />
           <span> {{ scope.row.publishDate }}</span>
         </template>
       </el-table-column>
@@ -137,23 +136,30 @@
             circle
             @click="handleEdit(scope.row)"
           />
-          <el-button title="回收" icon="el-icon-delete" circle type="danger" plain size="small"
-                     @click="handleDelete(scope.row)"
+          <el-button
+            title="回收"
+            icon="el-icon-delete"
+            circle
+            type="danger"
+            plain
+            size="small"
+            @click="handleDelete(scope.row)"
           />
         </template>
       </el-table-column>
     </el-table>
-    <el-pagination
-      background
-      layout="total, sizes, prev, pager, next"
-      :current-page="pageDTO.currentPage"
-      :page-size="pageDTO.pageSize"
-      :page-sizes="[10, 20, 50, 100, 200, 500, 1000, 2000]"
-      :total="bookTotal"
-      @size-change="handleSizeChange"
-      @current-change="handleCurrentChange"
-    />
-    <div class="app-container-footer"/>
+    <div class="pagination-container" style="margin-top: 5px">
+      <el-pagination
+        background
+        layout="total, sizes, prev, pager, next"
+        :current-page="pageDTO.currentPage"
+        :page-size="pageDTO.pageSize"
+        :page-sizes="[10, 20, 50, 100, 200, 500, 1000, 2000]"
+        :total="bookTotal"
+        @size-change="handleSizeChange"
+        @current-change="handleCurrentChange"
+      />
+    </div>
     <!--通过excel导入-->
     <el-dialog title="通过 Excel 导入图书信息" :visible.sync="importFormVisible" width="400px">
       <el-upload
@@ -167,7 +173,7 @@
         action="http://localhost:8081/files/upload"
         :auto-upload="false"
       >
-        <i class="el-icon-upload"/>
+        <i class="el-icon-upload" />
         <div class="el-upload__text">将.xlsx文件拖到此处，或 <em>点击选择文件</em></div>
         <div slot="tip" class="el-upload__tip">只能上传.xlsx文件，限制1个，大小不超过2MB</div>
       </el-upload>
@@ -183,10 +189,10 @@
         <el-tabs value="basicInfo">
           <el-tab-pane label="基本信息" name="basicInfo">
             <el-form-item label="书名" label-width="80px">
-              <el-input v-model="bookForm.name"/>
+              <el-input v-model="bookForm.name" />
             </el-form-item>
             <el-form-item label="作者" label-width="80px">
-              <el-input v-model="bookForm.author"/>
+              <el-input v-model="bookForm.author" />
             </el-form-item>
             <el-form-item label="出版日期" label-width="80px">
               <el-date-picker
@@ -196,10 +202,10 @@
               />
             </el-form-item>
             <el-form-item label="出版社" label-width="80px">
-              <el-input v-model="bookForm.publisher" autocomplete="off"/>
+              <el-input v-model="bookForm.publisher" autocomplete="off" />
             </el-form-item>
             <el-form-item label="译者" label-width="80px">
-              <el-input v-model="bookForm.translator" autocomplete="off"/>
+              <el-input v-model="bookForm.translator" autocomplete="off" />
             </el-form-item>
           </el-tab-pane>
           <el-tab-pane label="关于作者" name="aboutAuthor">
@@ -274,6 +280,7 @@ export default {
       uploadHeaders: {
         'X-Token': this.$store.getters.token
       },
+      maxTableHeight: 585,
       dialogTitle: '',
       bookTotal: 0,
       hasBookID: ''
@@ -282,6 +289,7 @@ export default {
   created() {
     this.fetchData()
   },
+
   methods: {
     handleBeforeClick(done) {
       this.$confirm('您所作的更改将全部丢失，确认关闭吗？', '内容尚未保存')
@@ -299,6 +307,9 @@ export default {
         this.pageDTO.pageSize = response.data.size
         this.bookTotal = response.data.total
         this.listLoading = false
+        // window.innerHeight 浏览器窗口的可见高度，减掉的是除了table最大高度的剩余空间
+        this.maxTableHeight = window.innerHeight - 145
+        console.log(this.maxTableHeight)
       })
     },
 
