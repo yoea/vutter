@@ -59,22 +59,17 @@ const actions = {
   // get user info
   getInfo({ commit, state }) {
     return new Promise((resolve, reject) => {
-      console.log('准备getInfo')
       getInfo(state.token).then(response => {
         const { data } = response
-
         if (!data) {
-          reject('Verification failed, please Login again.')
+          reject('验证失败，请重新登录')
         }
-
         const { username, avatar, email, nickname, motto } = data
-
         commit('SET_NAME', username)
         commit('SET_AVATAR', avatar)
         commit('SET_EMAIL', email)
         commit('SET_NICKNAME', nickname)
         commit('SET_MOTTO', motto)
-
         resolve(data)
       }).catch(error => {
         reject(error)
