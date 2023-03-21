@@ -249,6 +249,7 @@ export default {
       multipleSelection: [],
       bookFormVisible: false,
       importFormVisible: false,
+      // todo:改造回收站功能
       showRecycling: window.sessionStorage.getItem('show_recycle') || false,
       listLoading: true,
       pageDTO: JSON.parse(window.sessionStorage.getItem('pagination_params')) || {
@@ -309,7 +310,6 @@ export default {
         this.listLoading = false
         // window.innerHeight 浏览器窗口的可见高度，减掉的是除了table最大高度的剩余空间
         this.maxTableHeight = window.innerHeight - 145
-        console.log(this.maxTableHeight)
       })
     },
 
