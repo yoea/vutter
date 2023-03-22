@@ -1,5 +1,12 @@
 import request from '@/utils/request'
 
+export function deleteBatchByIds(ids) {
+  return request({
+    url: '/user/delete/ids=' + ids,
+    method: 'post'
+  })
+}
+
 export function login(data) {
   return request({
     url: '/user/login',

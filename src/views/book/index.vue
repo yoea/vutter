@@ -240,6 +240,7 @@
 
 <script>
 import { listBook, updateOrSave, deleteBook, deleteBatchByIds } from '@/api/book'
+import { deleteUser } from '@/api/user'
 
 export default {
   name: 'Index',
@@ -492,20 +493,33 @@ export default {
         return null
       }
     },
-    // 删除单个书籍信息
+
+    // 删除单个
     handleDelete(row) {
-      this.listLoading = true
-      this.params.id = row.id
-      console.log(this.params)
-      deleteBook(this.params).then(res => {
-        const msg = res.data ? '》成功！' : '》失败！'
-        this.$message({
-          message: '删除《' + row.name + msg,
-          duration: 1000,
-          type: res.data ? 'success' : 'warning',
-          showClose: true
+      this.$confirm('此操作将彻底删除该书籍, 是否继续?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        this.listLoading = true
+        this.params.id = row.id
+        console.log(this.params)
+        deleteBook(this.params).then(res => {
+          const msg = res.data ? '成功！' : '失败！'
+          this.$message({
+            message: '删除' + msg,
+            duration: 1000,
+            type: res.data ? 'success' : 'warning',
+            showClose: true
+          })
+          this.fetchData()
         })
-        this.fetchData()
+      }).catch(() => {
+        this.$message({
+          type: 'info',
+          message: '已取消删除',
+          duration: 1000
+        })
       })
     },
 

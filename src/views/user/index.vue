@@ -48,7 +48,7 @@
         <el-input
           v-model="pageDTO.keyWords"
           size="small"
-          placeholder="查找图书..."
+          placeholder="搜索用户..."
           clearable
           @keyup.enter.native="fetchData"
           @clear="fetchData"
@@ -62,9 +62,10 @@
 
     <!--表格区域-->
     <el-table
+      class="el-table-list"
       ref="handSelect_multipleTable"
       v-loading="listLoading"
-      :data="list"
+      :data="userList"
       element-loading-text="正在加载用户列表..."
       highlight-current-row
       height="590"
@@ -82,10 +83,12 @@
       </el-table-column>
       <el-table-column label="头像" width="50" prop="avatar" align="center">
         <template v-slot:default="scope">
-          <el-avatar :src="scope.row.avatar"></el-avatar>
+          <el-avatar :src="scope.row.avatar" @error="errorAvatarHandler">
+            <img src="https://yoea.github.io/facer/images/logo.png"/>
+          </el-avatar>
         </template>
       </el-table-column>
-      <el-table-column label="用户名" width="100" align="center" :show-overflow-tooltip="true">
+      <el-table-column label="用户名" width="100" align="center" sortable="custom" :show-overflow-tooltip="true">
         <template v-slot="scope">
           {{ scope.row.username }}
         </template>
@@ -100,29 +103,32 @@
           <span>{{ scope.row.password }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="邮箱" width="150" align="center" :show-overflow-tooltip="true">
+      <el-table-column label="邮箱" width="150" align="center" sortable="custom" :show-overflow-tooltip="true">
         <template v-slot="scope">
           {{ scope.row.email }}
         </template>
       </el-table-column>
-      <el-table-column label="注册时间" align="center" width="210">
+      <el-table-column label="注册时间" align="center" sortable="custom" width="210">
         <template v-slot="scope">
           <i v-if="scope.row.registered!=null" class="el-icon-time" />
           <span> {{ scope.row.registered }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="描述" width="180" sortable prop="motto" align="center">
+      <el-table-column label="描述" width="180" align="center">
         <template v-slot="scope">
           {{ scope.row.motto }}
         </template>
       </el-table-column>
-      <el-table-column label="状态" width="70" :show-overflow-tooltip="true">
+      <el-table-column label="状态" width="80" prop="userStatus" sortable="custom" :show-overflow-tooltip="true">
+        <!--接口中返回数字类型的值转化在浏览器中转化为对应文字-->
         <template v-slot="scope">
-          {{ scope.row.user_status }}
+          <el-tag :type="userStatusOptions[scope.row.userStatus].type">
+            {{ userStatusOptions[scope.row.userStatus].label }}
+          </el-tag>
         </template>
       </el-table-column>
       <!--行操作-->
-      <el-table-column label="操作" width="190" sortable prop="options" align="center">
+      <el-table-column label="操作" width="190" align="center">
         <template v-slot="scope">
           <el-button
             type="info"
@@ -160,7 +166,7 @@
         :current-page="pageDTO.currentPage"
         :page-size="pageDTO.pageSize"
         :page-sizes="[10, 20, 50, 100, 200, 500, 1000, 2000]"
-        :total="bookTotal"
+        :total="userTotal"
         @size-change="handleSizeChange"
         @current-change="handleCurrentChange"
       />
@@ -188,54 +194,94 @@
       </div>
     </el-dialog>
 
-    <!-- 图书信息新增和编辑-->
-    <el-dialog :visible.sync="bookFormVisible" :title="dialogTitle" top="45px" :before-close="handleBeforeClick">
-      <el-form :ref="userForm" :model="userForm" style="height: 55vh;  overflow-x: hidden;">
+    <!-- 用户信息新增和编辑-->
+    <el-dialog :visible.sync="editFormVisible" :title="dialogTitle" top="45px" width="45%" :before-close="handleBeforeClick">
+      <el-form :ref="userForm" :model="userForm" auto-complete="on" style="height: 55vh;overflow-x: hidden;">
         <el-tabs value="basicInfo">
           <el-tab-pane label="基本信息" name="basicInfo">
-            <el-form-item label="书名" label-width="80px">
-              <el-input v-model="userForm.name" />
-            </el-form-item>
-            <el-form-item label="作者" label-width="80px">
-              <el-input v-model="userForm.author" />
-            </el-form-item>
-            <el-form-item label="出版日期" label-width="80px">
-              <el-date-picker
-                v-model="userForm.publishDate"
-                type="date"
-                placeholder="请选择出版日期"
+            <el-row>
+              <el-col :span="11">
+                <el-form-item label="编号" label-width="80px" style="margin-right: 10px">
+                  <el-input v-model="userForm.id" :disabled="true" placeholder="系统自动生成" />
+                </el-form-item>
+                <div class="grid-content bg-purple-light" />
+              </el-col>
+              <el-col :span="12">
+                <el-form-item label="注册时间" label-width="80px">
+                  <el-date-picker
+                    v-model="userForm.registered"
+                    type="datetime"
+                    placeholder="默认为当前时间"
+                    :disabled="hasUserID"
+                  />
+                </el-form-item>
+                <div class="grid-content bg-purple" />
+              </el-col>
+            </el-row>
+            <el-form-item label="用户名" label-width="80px" style="margin-right: 50px">
+              <el-input
+                v-model="userForm.username"
+                placeholder="用户名不小于6位"
+                maxlength="36"
+                show-word-limit
               />
             </el-form-item>
-            <el-form-item label="出版社" label-width="80px">
-              <el-input v-model="userForm.publisher" autocomplete="off" />
+            <el-form-item label="邮箱" label-width="80px" style="margin-right: 50px">
+              <el-input
+                v-model="userForm.email"
+                placeholder="如：example@ewing.com"
+                maxlength="45"
+                show-word-limit
+              />
             </el-form-item>
-            <el-form-item label="译者" label-width="80px">
-              <el-input v-model="userForm.translator" autocomplete="off" />
+            <el-form-item label="昵称" label-width="80px" style="margin-right: 50px">
+              <el-input v-model="userForm.nickname" />
+            </el-form-item>
+            <el-form-item label="头像链接" label-width="80px" style="margin-right: 50px">
+              <el-input
+                v-model="userForm.avatar"
+              />
             </el-form-item>
           </el-tab-pane>
-          <el-tab-pane label="关于作者" name="aboutAuthor">
-            <el-form-item label="关于作者" label-width="80px">
+          <el-tab-pane label="关于用户" name="aboutUser">
+            <el-form-item label="个性描述" label-width="80px" style="margin-right: 50px">
               <el-input
-                v-model="userForm.authorInfo"
+                v-model="userForm.motto"
                 type="textarea"
-                :autosize="{ minRows: 10, maxRows: 15 }"
+                maxlength="254"
+                show-word-limit
+                :autosize="{ minRows: 6, maxRows: 10 }"
               />
             </el-form-item>
           </el-tab-pane>
-          <el-tab-pane label="图书简介" name="briefIntroduction">
-            <el-form-item label="图书简介" label-width="80px">
-              <el-input
-                v-model="userForm.summary"
-                type="textarea"
-                :autosize="{ minRows: 10, maxRows: 15 }"
+          <el-tab-pane label="高级设置" name="advancedSetting">
+            <el-form-item label="删除用户" label-width="80px" >
+              <el-switch
+                v-model="userForm.deleted"
+                active-text="删除"
+                inactive-text="正常"
+                active-color="#F56C6C"
               />
+            </el-form-item>
+            <el-form-item label="用户角色" label-width="80px">
+              <el-select v-model="userForm.userStatus" clearable placeholder="请选择角色">
+                <el-option
+                  v-for="item in userStatusOptions"
+                  :key="item.value"
+                  :label="item.label"
+                  :value="item.value"
+                />
+              </el-select>
+            </el-form-item>
+            <el-form-item label="登录密码" label-width="80px" style="margin-right: 50px">
+              <el-input v-model="userForm.password" placeholder="可输入密码或由系统自动生成" show-password />
             </el-form-item>
           </el-tab-pane>
         </el-tabs>
       </el-form>
       <template #footer>
         <span>
-          <el-button @click="bookFormVisible = false">取消</el-button>
+          <el-button @click="editFormVisible = false">取消</el-button>
           <el-button type="primary" @click="saveBook">保存</el-button>
         </span>
       </template>
@@ -244,15 +290,15 @@
 </template>
 
 <script>
-import { listUser, updateOrSave, deleteUser } from '@/api/user'
+import { listUser, updateOrSave, deleteUser, deleteBatchByIds } from '@/api/user'
 
 export default {
   name: 'Index',
   data() {
     return {
-      list: [],
+      userList: [],
       multipleSelection: [],
-      bookFormVisible: false,
+      editFormVisible: false,
       importFormVisible: false,
       listLoading: true,
       pageDTO: JSON.parse(window.sessionStorage.getItem('pagination_params')) || {
@@ -274,7 +320,7 @@ export default {
         registered: '',
         avatar: '',
         motto: '',
-        user_status: '',
+        userStatus: 0,
         deleted: 0
       },
       uploadHeaders: {
@@ -282,8 +328,29 @@ export default {
       },
       maxTableHeight: 585,
       dialogTitle: '',
-      bookTotal: 0,
-      hasBookID: ''
+      userTotal: 0,
+      hasUserID: false,
+      userStatusOptions: [{
+        value: 0,
+        label: '普通用户',
+        type: 'info'
+      }, {
+        value: 1,
+        label: '编辑者',
+        type: 'default'
+      }, {
+        value: 2,
+        label: '会员',
+        type: 'danger'
+      }, {
+        value: 3,
+        label: '超级会员',
+        type: 'warning'
+      }, {
+        value: 4,
+        label: '管理员',
+        type: 'success'
+      }]
     }
   },
   created() {
@@ -302,32 +369,38 @@ export default {
     fetchData() {
       this.listLoading = true
       listUser(this.pageDTO).then(response => {
-        this.list = response.data.records
+        this.userList = response.data.records
         this.pageDTO.currentPage = response.data.current
         this.pageDTO.pageSize = response.data.size
-        this.bookTotal = response.data.total
+        this.userTotal = response.data.total
         this.listLoading = false
         // window.innerHeight 浏览器窗口的可见高度，减掉的是除了table最大高度的剩余空间
         this.maxTableHeight = window.innerHeight - 145
       })
     },
 
-    // 新增及更新书籍
+    // 新增及更新
     saveBook() {
       this.listLoading = true
+      if (this.userForm.deleted) {
+        this.params.id = this.userForm.id
+        deleteUser(this.params)
+      }
       updateOrSave(this.userForm).then(response => {
         if (response.data === true) {
           const title = response.message
           this.$notify({
             title: title,
-            message: this.userForm.name + ' 的信息已经存到云端',
+            message: this.userForm.username + ' 的信息已经存到云端',
             type: 'success',
             duration: 2500,
             position: 'top-left'
           })
         }
         this.fetchData()
-        this.bookFormVisible = false
+        this.editFormVisible = false
+      }).catch(() => {
+        this.fetchData()
       })
     },
     // 上传前判断
@@ -350,13 +423,11 @@ export default {
     },
     // 确认上传
     submitUpload() {
-      console.log('点击了确认上传按钮')
       console.log(this.uploadHeaders)
       this.$refs.uploadFile.submit()
     },
     // 导入按钮打开dialog
     handleImport() {
-      console.log('点击了导入按钮')
       this.importFormVisible = true
     },
     // 导出菜单
@@ -438,38 +509,24 @@ export default {
         this.fetchData()
       }
     },
-    // 回收站显示与否
-    showRecyclingSwitch() {
-      this.pageDTO.delFlg = this.showRecycling ? 1 : 0
-      this.pageDTO.currentPage = 1
-      window.sessionStorage.setItem('show_recycle', this.showRecycling)
-      window.sessionStorage.setItem('pagination_params', JSON.stringify(this.pageDTO))
-      this.fetchData()
-      const sta = this.pageDTO.delFlg ? '草稿' : '发布'
-      this.$message({
-        message: '当前显示的是已标记为' + sta + '的条目',
-        duration: 1000,
-        showClose: true
-      })
-    },
+
     // 添加
     handleAdd() {
-      this.hasBookID = ''
-      this.dialogTitle = '新增图书'
+      this.hasUserID = false
+      this.dialogTitle = '新增用户'
       this.userForm = {} // 清空缓冲区
-      this.bookFormVisible = true
+      this.editFormVisible = true
     },
     // 编辑
     handleEdit(row) {
-      this.hasBookID = row.id
-      this.dialogTitle = '修改图书信息'
+      this.hasUserID = true
+      this.dialogTitle = '修改信息'
       this.userForm = JSON.parse(JSON.stringify(row))
-      this.bookFormVisible = true
+      this.editFormVisible = true
     },
 
     // 清空已选择项目
     unSelectAll() {
-      console.log('清空选项')
       this.multipleSelection = []
       this.$refs.handSelect_multipleTable.clearSelection()
     },
@@ -477,7 +534,6 @@ export default {
     // 点击复选框触发，复选框样式的改变
     handleSelectionChange(val) {
       this.multipleSelection = val
-      console.log(this.multipleSelection) // 打印选中的行集合
     },
 
     // 获取已选择的数据的ID
@@ -491,21 +547,37 @@ export default {
         return null
       }
     },
-    // 删除单个书籍信息
+    // 删除单个
     handleDelete(row) {
-      this.listLoading = true
-      this.params.id = row.id
-      console.log(this.params)
-      deleteUser(this.params).then(res => {
-        const msg = res.data ? '成功！' : '失败！'
-        this.$message({
-          message: '删除' + row.name + msg,
-          duration: 1000,
-          type: res.data ? 'success' : 'warning',
-          showClose: true
+      this.$confirm('此操作将彻底删除该用户, 是否继续?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        this.listLoading = true
+        this.params.id = row.id
+        console.log(this.params)
+        deleteUser(this.params).then(res => {
+          const msg = res.data ? '成功！' : '失败！'
+          this.$message({
+            message: '删除' + msg,
+            duration: 1000,
+            type: res.data ? 'success' : 'warning',
+            showClose: true
+          })
+          this.fetchData()
         })
-        this.fetchData()
+      }).catch(() => {
+        this.$message({
+          type: 'info',
+          message: '已取消删除',
+          duration: 1000
+        })
       })
+    },
+    // 头像加载失败时候触发
+    errorAvatarHandler() {
+      return true
     },
 
     // 处理按钮点击后不失去焦点的问题

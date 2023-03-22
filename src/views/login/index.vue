@@ -139,28 +139,11 @@
 </template>
 
 <script>
+import { validateEmail, validatePassword, validateUsername } from '@/utils/validate'
 
 export default {
   name: 'Login',
   data() {
-    const validateUsername = (rule, value, callback) => {
-      const userReg = /^([a-zA-Z0-9_-])/
-      if (value < 4) {
-        return callback(new Error('用户名不能少于4位'))
-      }
-      if (userReg.test(value)) {
-        callback()
-      } else {
-        callback(new Error('用户名不合法'))
-      }
-    }
-    const validatePassword = (rule, value, callback) => {
-      if (value.length < 6) {
-        callback(new Error('密码不能少于6位'))
-      } else {
-        callback()
-      }
-    }
     // 验证确认密码
     const ReValidatePassword = (rule, value, callback) => {
       if (value === '') {
@@ -170,19 +153,6 @@ export default {
       } else {
         callback()
       }
-    }
-    const validateEmail = (rule, value, callback) => {
-      const mailReg = /^([a-zA-Z0-9_-])+@([a-zA-Z0-9_-])+(.[a-zA-Z0-9_-])+/
-      if (!value) {
-        return callback(new Error('邮箱不能为空'))
-      }
-      setTimeout(() => {
-        if (mailReg.test(value)) {
-          callback()
-        } else {
-          callback(new Error('请输入正确的邮箱格式'))
-        }
-      }, 100)
     }
     return {
       loginForm: {
@@ -262,7 +232,10 @@ export default {
             this.loading = false
           })
         } else {
-          console.log('error submit!!')
+          this.$message({
+            message: '提交失败，请检查后重试',
+            type: 'error'
+          })
           return false
         }
       })
