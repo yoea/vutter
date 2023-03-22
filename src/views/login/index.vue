@@ -12,7 +12,7 @@
         <el-input
           ref="username"
           v-model="loginForm.username"
-          placeholder="Username"
+          placeholder="用户名"
           name="username"
           type="text"
           tabindex="1"
@@ -29,7 +29,7 @@
           ref="password"
           v-model="loginForm.password"
           :type="passwordType"
-          placeholder="Password"
+          placeholder="密码"
           name="password"
           tabindex="2"
           auto-complete="on"
@@ -101,7 +101,7 @@
           :type="passwordType"
           placeholder="确认密码"
           name="checkPassword"
-          tabindex="2"
+          tabindex="3"
           auto-complete="on"
           @keyup.enter.native="handleRegister"
         />
@@ -119,7 +119,7 @@
           placeholder="邮箱"
           name="email"
           type="text"
-          tabindex="1"
+          tabindex="4"
           auto-complete="on"
           @keyup.enter.native="handleRegister"
         />

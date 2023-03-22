@@ -67,8 +67,9 @@
       :data="list"
       element-loading-text="正在加载用户列表..."
       highlight-current-row
+      height="590"
       :max-height="maxTableHeight"
-      :cell-style="{padding:'9px 0 9px 0'}"
+      :cell-style="{padding:'5px 0 5px 0'}"
       row-key="id"
       @sort-change="handleSortChange"
       @selection-change="handleSelectionChange"
@@ -141,7 +142,7 @@
             @click="handleEdit(scope.row)"
           />
           <el-button
-            title="回收"
+            title="删除"
             icon="el-icon-delete"
             circle
             type="danger"
@@ -189,33 +190,33 @@
 
     <!-- 图书信息新增和编辑-->
     <el-dialog :visible.sync="bookFormVisible" :title="dialogTitle" top="45px" :before-close="handleBeforeClick">
-      <el-form :ref="bookForm" :model="bookForm" style="height: 55vh;  overflow-x: hidden;">
+      <el-form :ref="userForm" :model="userForm" style="height: 55vh;  overflow-x: hidden;">
         <el-tabs value="basicInfo">
           <el-tab-pane label="基本信息" name="basicInfo">
             <el-form-item label="书名" label-width="80px">
-              <el-input v-model="bookForm.name" />
+              <el-input v-model="userForm.name" />
             </el-form-item>
             <el-form-item label="作者" label-width="80px">
-              <el-input v-model="bookForm.author" />
+              <el-input v-model="userForm.author" />
             </el-form-item>
             <el-form-item label="出版日期" label-width="80px">
               <el-date-picker
-                v-model="bookForm.publishDate"
+                v-model="userForm.publishDate"
                 type="date"
                 placeholder="请选择出版日期"
               />
             </el-form-item>
             <el-form-item label="出版社" label-width="80px">
-              <el-input v-model="bookForm.publisher" autocomplete="off" />
+              <el-input v-model="userForm.publisher" autocomplete="off" />
             </el-form-item>
             <el-form-item label="译者" label-width="80px">
-              <el-input v-model="bookForm.translator" autocomplete="off" />
+              <el-input v-model="userForm.translator" autocomplete="off" />
             </el-form-item>
           </el-tab-pane>
           <el-tab-pane label="关于作者" name="aboutAuthor">
             <el-form-item label="关于作者" label-width="80px">
               <el-input
-                v-model="bookForm.authorInfo"
+                v-model="userForm.authorInfo"
                 type="textarea"
                 :autosize="{ minRows: 10, maxRows: 15 }"
               />
@@ -224,7 +225,7 @@
           <el-tab-pane label="图书简介" name="briefIntroduction">
             <el-form-item label="图书简介" label-width="80px">
               <el-input
-                v-model="bookForm.summary"
+                v-model="userForm.summary"
                 type="textarea"
                 :autosize="{ minRows: 10, maxRows: 15 }"
               />
@@ -259,25 +260,21 @@ export default {
         pageSize: 10,
         keyWords: '',
         deleted: 0,
-        orderIsAsc: false, // 是否正序
+        orderIsAsc: true, // 是否正序
         orderColumns: ['id']
       },
       params: {
         id: ''
       },
-      bookForm: {
+      userForm: {
         id: '',
-        name: '',
-        author: '',
-        publishDate: '',
-        publisher: '',
-        pages: '',
-        isbn: '',
-        price: '',
-        cover: '',
-        translator: '',
-        summary: '',
-        authorInfo: '',
+        username: '',
+        password: '',
+        email: '',
+        registered: '',
+        avatar: '',
+        motto: '',
+        user_status: '',
         deleted: 0
       },
       uploadHeaders: {
@@ -318,12 +315,12 @@ export default {
     // 新增及更新书籍
     saveBook() {
       this.listLoading = true
-      updateOrSave(this.bookForm).then(response => {
+      updateOrSave(this.userForm).then(response => {
         if (response.data === true) {
           const title = response.message
           this.$notify({
             title: title,
-            message: this.bookForm.name + ' 的信息已经存到云端',
+            message: this.userForm.name + ' 的信息已经存到云端',
             type: 'success',
             duration: 2500,
             position: 'top-left'
@@ -459,14 +456,14 @@ export default {
     handleAdd() {
       this.hasBookID = ''
       this.dialogTitle = '新增图书'
-      this.bookForm = {} // 清空缓冲区
+      this.userForm = {} // 清空缓冲区
       this.bookFormVisible = true
     },
     // 编辑
     handleEdit(row) {
       this.hasBookID = row.id
       this.dialogTitle = '修改图书信息'
-      this.bookForm = JSON.parse(JSON.stringify(row))
+      this.userForm = JSON.parse(JSON.stringify(row))
       this.bookFormVisible = true
     },
 
@@ -499,10 +496,10 @@ export default {
       this.listLoading = true
       this.params.id = row.id
       console.log(this.params)
-      deleteBook(this.params).then(res => {
-        const msg = res.data ? '》成功！' : '》失败！'
+      deleteUser(this.params).then(res => {
+        const msg = res.data ? '成功！' : '失败！'
         this.$message({
-          message: '删除《' + row.name + msg,
+          message: '删除' + row.name + msg,
           duration: 1000,
           type: res.data ? 'success' : 'warning',
           showClose: true
