@@ -88,7 +88,7 @@
           </el-avatar>
         </template>
       </el-table-column>
-      <el-table-column label="用户名" width="100" align="center" sortable="custom" :show-overflow-tooltip="true">
+      <el-table-column label="用户名" width="130" align="center" sortable="custom" :show-overflow-tooltip="true">
         <template v-slot="scope">
           {{ scope.row.username }}
         </template>
@@ -98,12 +98,15 @@
           {{ scope.row.nickname }}
         </template>
       </el-table-column>
-      <el-table-column label="密码" align="center" :show-overflow-tooltip="true">
-        <template v-slot="scope">
-          <span>{{ scope.row.password }}</span>
+      <el-table-column label="密码" align="center" width="120" :show-overflow-tooltip="true">
+        <template v-if="isCellShowPassword" v-slot="scope">
+          <span @click="isCellShowPassword=false">{{ scope.row.password }}</span>
+        </template>
+        <template v-if="!isCellShowPassword">
+          <span @click="isCellShowPassword=true">********</span>
         </template>
       </el-table-column>
-      <el-table-column label="邮箱" width="150" align="center" sortable="custom" :show-overflow-tooltip="true">
+      <el-table-column label="邮箱" align="center"  width="180" sortable="custom" :show-overflow-tooltip="true">
         <template v-slot="scope">
           {{ scope.row.email }}
         </template>
@@ -114,16 +117,16 @@
           <span> {{ scope.row.registered }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="描述" width="180" align="center">
+      <el-table-column label="描述" align="center">
         <template v-slot="scope">
           {{ scope.row.motto }}
         </template>
       </el-table-column>
-      <el-table-column label="状态" width="80" prop="userStatus" sortable="custom" :show-overflow-tooltip="true">
+      <el-table-column label="状态" width="80" prop="userStatus" sortable="custom" align="center" :show-overflow-tooltip="true">
         <!--接口中返回数字类型的值转化在浏览器中转化为对应文字-->
         <template v-slot="scope">
-          <el-tag :type="userStatusOptions[scope.row.role].type">
-            {{ userStatusOptions[scope.row.role].label }}
+          <el-tag :type="userRolesList[scope.row.role].type">
+            {{ userRolesList[scope.row.role].label }}
           </el-tag>
         </template>
       </el-table-column>
@@ -266,7 +269,7 @@
             <el-form-item label="用户角色" label-width="80px">
               <el-select v-model="userForm.role" clearable placeholder="请选择角色">
                 <el-option
-                  v-for="item in userStatusOptions"
+                  v-for="item in userRolesList"
                   :key="item.value"
                   :label="item.label"
                   :value="item.value"
@@ -330,27 +333,7 @@ export default {
       dialogTitle: '',
       userTotal: 0,
       hasUserID: false,
-      userStatusOptions: [{
-        value: 0,
-        label: '普通用户',
-        type: 'info'
-      }, {
-        value: 1,
-        label: '编辑者',
-        type: 'default'
-      }, {
-        value: 2,
-        label: '会员',
-        type: 'danger'
-      }, {
-        value: 3,
-        label: '超级会员',
-        type: 'warning'
-      }, {
-        value: 4,
-        label: '管理员',
-        type: 'success'
-      }],
+      isCellShowPassword: false,
       userRolesList: this.$store.getters.roles
     }
   },
@@ -368,7 +351,6 @@ export default {
         })
     },
     fetchData() {
-      console.log(this.userRolesList)
       this.listLoading = true
       listUser(this.pageDTO).then(response => {
         this.userList = response.data.records
@@ -378,7 +360,6 @@ export default {
         this.listLoading = false
         // window.innerHeight 浏览器窗口的可见高度，减掉的是除了table最大高度的剩余空间
         this.maxTableHeight = window.innerHeight - 145
-        console.log(this.userList)
       })
     },
 
