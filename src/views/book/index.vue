@@ -64,7 +64,7 @@
     <el-table
       ref="handSelect_multipleTable"
       v-loading="listLoading"
-      :data="list"
+      :data="bookList"
       element-loading-text="正在加载图书列表..."
       highlight-current-row
       :max-height="maxTableHeight"
@@ -126,6 +126,7 @@
             title="查看"
             icon="el-icon-view"
             circle
+            @click="handleShowDetail(scope.row)"
           />
           <el-button
             title="编辑"
@@ -183,8 +184,31 @@
       </div>
     </el-dialog>
 
+    <!--查看图书详情-->
+    <el-dialog :visible.sync="showBookDetail" title="图书详情" top="45px" width="40%">
+      <template>
+        <el-image
+          :src="bookForm.cover"
+          style="width: 150px;min-width:220px">
+          <div slot="error" class="image-slot">
+            <i class="el-icon-picture-outline"></i>
+          </div>
+        </el-image>
+        <div style="padding: 14px;">
+          <span>{{ bookForm.name }}</span>
+          <div class="bottom card-header">
+            <span  class="time">{{ bookForm.publishDate }}</span>
+            <span>{{ bookForm.author }}</span>
+            <div class="block">
+              <el-rate v-model = "bookForm.price/10" ></el-rate>
+            </div>
+          </div>
+        </div>
+      </template>
+    </el-dialog>
+
     <!-- 图书信息新增和编辑-->
-    <el-dialog :visible.sync="bookFormVisible" :title="dialogTitle" top="45px" :before-close="handleBeforeClick">
+    <el-dialog :visible.sync="bookFormVisible" :title="dialogTitle" top="45px" :before-close="handleBeforeClose">
       <el-form :ref="bookForm" :model="bookForm" style="height: 55vh;  overflow-x: hidden;">
         <el-tabs value="basicInfo">
           <el-tab-pane label="基本信息" name="basicInfo">
@@ -240,19 +264,19 @@
 
 <script>
 import { listBook, updateOrSave, deleteBook, deleteBatchByIds } from '@/api/book'
-import { deleteUser } from '@/api/user'
 
 export default {
   name: 'Index',
   data() {
     return {
-      list: [],
+      bookList: [],
       multipleSelection: [],
       bookFormVisible: false,
       importFormVisible: false,
       // todo:改造回收站功能
       showRecycling: window.sessionStorage.getItem('show_recycle') || false,
       listLoading: true,
+      showBookDetail: false,
       pageDTO: JSON.parse(window.sessionStorage.getItem('pagination_params')) || {
         currentPage: 1,
         pageSize: 10,
@@ -293,7 +317,7 @@ export default {
   },
 
   methods: {
-    handleBeforeClick(done) {
+    handleBeforeClose(done) {
       this.$confirm('您所作的更改将全部丢失，确认关闭吗？', '内容尚未保存')
         .then(_ => {
           done()
@@ -304,7 +328,7 @@ export default {
     fetchData() {
       this.listLoading = true
       listBook(this.pageDTO).then(response => {
-        this.list = response.data.records
+        this.bookList = response.data.records
         this.pageDTO.currentPage = response.data.current
         this.pageDTO.pageSize = response.data.size
         this.bookTotal = response.data.total
@@ -440,20 +464,20 @@ export default {
         this.fetchData()
       }
     },
-    // 回收站显示与否
-    showRecyclingSwitch() {
-      this.pageDTO.delFlg = this.showRecycling ? 1 : 0
-      this.pageDTO.currentPage = 1
-      window.sessionStorage.setItem('show_recycle', this.showRecycling)
-      window.sessionStorage.setItem('pagination_params', JSON.stringify(this.pageDTO))
-      this.fetchData()
-      const sta = this.pageDTO.delFlg ? '草稿' : '发布'
-      this.$message({
-        message: '当前显示的是已标记为' + sta + '的条目',
-        duration: 1000,
-        showClose: true
-      })
-    },
+    // // 回收站显示与否
+    // showRecyclingSwitch() {
+    //   this.pageDTO.delFlg = this.showRecycling ? 1 : 0
+    //   this.pageDTO.currentPage = 1
+    //   window.sessionStorage.setItem('show_recycle', this.showRecycling)
+    //   window.sessionStorage.setItem('pagination_params', JSON.stringify(this.pageDTO))
+    //   this.fetchData()
+    //   const sta = this.pageDTO.delFlg ? '草稿' : '发布'
+    //   this.$message({
+    //     message: '当前显示的是已标记为' + sta + '的条目',
+    //     duration: 1000,
+    //     showClose: true
+    //   })
+    // },
     // 添加
     handleAdd() {
       this.hasBookID = ''
@@ -467,6 +491,18 @@ export default {
       this.dialogTitle = '修改图书信息'
       this.bookForm = JSON.parse(JSON.stringify(row))
       this.bookFormVisible = true
+    },
+    // 查看图书详情
+    handleShowDetail(row) {
+      this.showBookDetail = true
+      this.bookForm = JSON.parse(JSON.stringify(row))
+      this.bookForm.cover = this.getImageURL(row.cover)
+      console.log(this.bookForm)
+    },
+
+    // 获取图书封面URL
+    getImageURL(fileName) {
+      return 'http://localhost:8081/book/cover/' + fileName
     },
 
     // 清空已选择项目
