@@ -122,8 +122,8 @@
       <el-table-column label="状态" width="80" prop="userStatus" sortable="custom" :show-overflow-tooltip="true">
         <!--接口中返回数字类型的值转化在浏览器中转化为对应文字-->
         <template v-slot="scope">
-          <el-tag :type="userStatusOptions[scope.row.userStatus].type">
-            {{ userStatusOptions[scope.row.userStatus].label }}
+          <el-tag :type="userStatusOptions[scope.row.role].type">
+            {{ userStatusOptions[scope.row.role].label }}
           </el-tag>
         </template>
       </el-table-column>
@@ -264,7 +264,7 @@
               />
             </el-form-item>
             <el-form-item label="用户角色" label-width="80px">
-              <el-select v-model="userForm.userStatus" clearable placeholder="请选择角色">
+              <el-select v-model="userForm.role" clearable placeholder="请选择角色">
                 <el-option
                   v-for="item in userStatusOptions"
                   :key="item.value"
@@ -320,7 +320,7 @@ export default {
         registered: '',
         avatar: '',
         motto: '',
-        userStatus: 0,
+        role: 0,
         deleted: 0
       },
       uploadHeaders: {
@@ -350,7 +350,8 @@ export default {
         value: 4,
         label: '管理员',
         type: 'success'
-      }]
+      }],
+      userRolesList: this.$store.getters.roles
     }
   },
   created() {
@@ -367,6 +368,7 @@ export default {
         })
     },
     fetchData() {
+      console.log(this.userRolesList)
       this.listLoading = true
       listUser(this.pageDTO).then(response => {
         this.userList = response.data.records
@@ -376,6 +378,7 @@ export default {
         this.listLoading = false
         // window.innerHeight 浏览器窗口的可见高度，减掉的是除了table最大高度的剩余空间
         this.maxTableHeight = window.innerHeight - 145
+        console.log(this.userList)
       })
     },
 

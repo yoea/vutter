@@ -62,7 +62,7 @@ const actions = {
       getInfo(state.token).then(response => {
         const { data } = response
         if (!data) {
-          reject('验证失败，请重新登录')
+          reject('获取失败，请稍后重试')
         }
         const { username, avatar, email, nickname, motto } = data
         commit('SET_NAME', username)
