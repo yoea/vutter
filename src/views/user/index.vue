@@ -175,7 +175,7 @@
       />
     </div>
     <!--通过excel导入-->
-    <el-dialog title="通过 Excel 导入图书信息" :visible.sync="importFormVisible" width="400px">
+    <el-dialog title="通过 Excel 导入" :visible.sync="importFormVisible" width="400px">
       <el-upload
         ref="uploadFile"
         class="upload-demo"
@@ -199,7 +199,7 @@
 
     <!-- 用户信息新增和编辑-->
     <el-dialog :visible.sync="editFormVisible" :title="dialogTitle" top="45px" width="45%" :before-close="handleBeforeClick">
-      <el-form :ref="userForm" :model="userForm" auto-complete="on" style="height: 55vh;overflow-x: hidden;">
+      <el-form ref="userForm" :model="userForm" auto-complete="on" style="height: 55vh;overflow-x: hidden;" :rules="userFormRules">
         <el-tabs value="basicInfo">
           <el-tab-pane label="基本信息" name="basicInfo">
             <el-row>
@@ -221,20 +221,20 @@
                 <div class="grid-content bg-purple" />
               </el-col>
             </el-row>
-            <el-form-item label="用户名" label-width="80px" style="margin-right: 50px">
+            <el-form-item label="用户名" label-width="80px" prop="username" style="margin-right: 50px">
               <el-input
+                ref="username"
                 v-model="userForm.username"
-                placeholder="用户名不小于6位"
-                maxlength="36"
-                show-word-limit
+                name="username"
+                type="text"
+                placeholder="请输入用户名"
               />
             </el-form-item>
-            <el-form-item label="邮箱" label-width="80px" style="margin-right: 50px">
+            <el-form-item key="email" label="邮箱" prop="email" label-width="80px" style="margin-right: 50px">
               <el-input
+                ref="email"
                 v-model="userForm.email"
-                placeholder="如：example@ewing.com"
-                maxlength="45"
-                show-word-limit
+                placeholder="example@ewing.com"
               />
             </el-form-item>
             <el-form-item label="昵称" label-width="80px" style="margin-right: 50px">
@@ -277,7 +277,13 @@
               </el-select>
             </el-form-item>
             <el-form-item label="登录密码" label-width="80px" style="margin-right: 50px">
-              <el-input v-model="userForm.password" placeholder="可输入密码或由系统自动生成" show-password />
+              <el-input
+                ref="password"
+                v-model="userForm.password"
+                placeholder="可输入密码或由系统自动生成"
+                name="password"
+                show-password
+              />
             </el-form-item>
           </el-tab-pane>
         </el-tabs>
@@ -295,6 +301,7 @@
 <script>
 import { listUser, updateOrSave, deleteUser, deleteBatchByIds } from '@/api/user'
 import { dateFormat } from '@/utils'
+import { validateEmail, validatePassword, validateUsername } from '@/utils/validate'
 
 export default {
   name: 'Index',
@@ -335,7 +342,12 @@ export default {
       userTotal: 0,
       hasUserID: false,
       isCellShowPassword: false,
-      userRolesList: this.$store.getters.roles
+      userRolesList: this.$store.getters.roles,
+      userFormRules: {
+        username: [{ required: true, trigger: 'blur', validator: validateUsername }],
+        password: [{ required: true, trigger: 'blur', validator: validatePassword }],
+        email: [{ required: true, trigger: 'blur', validator: validateEmail }]
+      }
     }
   },
   created() {
@@ -360,7 +372,6 @@ export default {
         this.pageDTO.pageSize = response.data.size
         this.userTotal = response.data.total
         this.listLoading = false
-        console.log(dateFormat(this.userList[3].registered, 'YYYY-mm-dd HH:MM'))
         // window.innerHeight 浏览器窗口的可见高度，减掉的是除了table最大高度的剩余空间
         this.maxTableHeight = window.innerHeight - 145
       })
@@ -368,26 +379,36 @@ export default {
 
     // 新增及更新
     saveBook() {
-      this.listLoading = true
-      if (this.userForm.deleted) {
-        this.params.id = this.userForm.id
-        deleteUser(this.params)
-      }
-      updateOrSave(this.userForm).then(response => {
-        if (response.data === true) {
-          const title = response.message
-          this.$notify({
-            title: title,
-            message: this.userForm.username + ' 的信息已经存到云端',
-            type: 'success',
-            duration: 2500,
-            position: 'top-left'
+      this.$refs.userForm.validate(valid => {
+        if (valid) {
+          this.listLoading = true
+          if (this.userForm.deleted) {
+            this.params.id = this.userForm.id
+            deleteUser(this.params)
+          }
+          updateOrSave(this.userForm).then(response => {
+            if (response.data === true) {
+              const title = response.message
+              this.$notify({
+                title: title,
+                message: this.userForm.username + ' 的信息已经存到云端',
+                type: 'success',
+                duration: 2500,
+                position: 'top-left'
+              })
+            }
+            this.fetchData()
+            this.editFormVisible = false
+          }).catch(() => {
+            this.fetchData()
           })
+        } else {
+          this.$message({
+            message: '提交失败，请检查是否填写正确后重试',
+            type: 'error'
+          })
+          return false
         }
-        this.fetchData()
-        this.editFormVisible = false
-      }).catch(() => {
-        this.fetchData()
       })
     },
     // 上传前判断

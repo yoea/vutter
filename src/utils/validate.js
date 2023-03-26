@@ -10,8 +10,8 @@ export function isExternal(path) {
 // 用户名格式验证
 export function validateUsername(rule, value, callback) {
   const userReg = /^([a-zA-Z0-9_-])/
-  if (value < 4) {
-    return callback(new Error('用户名不能少于4位'))
+  if (value.length < 5) {
+    return callback(new Error('用户名不能少于5位'))
   }
   if (userReg.test(value)) {
     callback()
