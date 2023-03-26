@@ -185,25 +185,34 @@
     </el-dialog>
 
     <!--查看图书详情-->
-    <el-dialog :visible.sync="showBookDetail" title="图书详情" top="45px" width="40%">
+    <el-dialog :visible.sync="showBookDetail" title="图书详情" top="45px" width="50%">
       <template>
-        <el-image
-          :src="bookForm.cover"
-          style="width: 150px;min-width:220px">
-          <div slot="error" class="image-slot">
-            <i class="el-icon-picture-outline"></i>
-          </div>
-        </el-image>
-        <div style="padding: 14px;">
-          <span>{{ bookForm.name }}</span>
-          <div class="bottom card-header">
-            <span  class="time">{{ bookForm.publishDate }}</span>
-            <span>{{ bookForm.author }}</span>
-            <div class="block">
-              <el-rate v-model = "bookForm.price/10" ></el-rate>
-            </div>
-          </div>
-        </div>
+        <el-row >
+          <el-col :span="12">
+            <el-image
+              :src="bookForm.cover"
+              style="width: 150px;min-width:220px"
+            >
+              <div slot="error" class="image-slot">
+                <i class="el-icon-picture-outline" />
+              </div>
+            </el-image></el-col>
+          <el-col :span="12">
+            <el-descriptions class="margin-top" title="基本信息" :column="2" direction="horizontal" border>
+              <el-descriptions-item label="书名" :span="2">{{ bookForm.name }}</el-descriptions-item>
+              <el-descriptions-item label="作者"><el-tag size="small" v-if="bookForm.author != null">
+                <a type="button" @click="searchBookByAuthor(bookForm.author)">{{ bookForm.author }}</a>
+              </el-tag></el-descriptions-item>
+              <el-descriptions-item label="译者">{{ bookForm.translator }}</el-descriptions-item>
+              <el-descriptions-item label="出版社" :span="2">{{ bookForm.publisher }}</el-descriptions-item>
+              <el-descriptions-item label="出版日期" :span="2">{{ bookForm.publishDate }}</el-descriptions-item>
+              <el-descriptions-item label="页数">{{ bookForm.pages }}</el-descriptions-item>
+              <el-descriptions-item label="售价" v-if="bookForm.price>1">￥{{ bookForm.price }}</el-descriptions-item>
+              <el-descriptions-item label="编号">{{ bookForm.id }}</el-descriptions-item>
+            </el-descriptions>
+          </el-col>
+        </el-row>
+
       </template>
     </el-dialog>
 
@@ -230,6 +239,9 @@
             </el-form-item>
             <el-form-item label="译者" label-width="80px">
               <el-input v-model="bookForm.translator" autocomplete="off" />
+            </el-form-item>
+            <el-form-item label="封面" label-width="80px">
+              <el-input v-model="bookForm.cover" autocomplete="off" />
             </el-form-item>
           </el-tab-pane>
           <el-tab-pane label="关于作者" name="aboutAuthor">
@@ -337,7 +349,12 @@ export default {
         this.maxTableHeight = window.innerHeight - 145
       })
     },
-
+    searchBookByAuthor(author){
+      this.showBookDetail=false
+      this.handleCurrentChange(1)
+      this.pageDTO.keyWords=author
+      this.fetchData()
+    },
     // 新增及更新书籍
     saveBook() {
       this.listLoading = true
@@ -496,8 +513,9 @@ export default {
     handleShowDetail(row) {
       this.showBookDetail = true
       this.bookForm = JSON.parse(JSON.stringify(row))
-      this.bookForm.cover = this.getImageURL(row.cover)
-      console.log(this.bookForm)
+      if (typeof row.cover === 'undefined' || row.cover == null || row.cover === '') {
+        this.bookForm.cover = require('@/assets/404_images/404.png')
+      } else { this.bookForm.cover = this.getImageURL(row.cover) }
     },
 
     // 获取图书封面URL
@@ -599,3 +617,14 @@ export default {
   }
 }
 </script>
+<style scoped>
+.image-slot {
+  width:  150px;
+  height: 250px;
+  min-width:220px;
+}
+.book-show-title{
+  padding: 10px;
+  line-height: 28px;
+}
+</style>

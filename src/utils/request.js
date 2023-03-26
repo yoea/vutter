@@ -21,7 +21,7 @@ service.interceptors.request.use(
       // please modify it according to the actual situation
       config.headers['X-Token'] = getToken()
     }
-    config.headers['Content-Type'] = 'application/json;charset=utf-8';
+    config.headers['Content-Type'] = 'application/json;charset=utf-8'
     return config
   },
   error => {
@@ -60,7 +60,7 @@ service.interceptors.response.use(
       })
 
       // 50008: Illegal token; 50012: Other clients logged in; 50014: Token expired;
-      if (res.code === 401 || res.code === 403 ) {
+      if (res.code === 401 || res.code === 403) {
         // to re-login
         MessageBox.confirm('操作失败，您可选择点击取消留在此页面或重新登录', '登录过期或密钥已失效', {
           confirmButtonText: '重新登录',

@@ -32,7 +32,7 @@
               系统设置
             </el-dropdown-item>
           </router-link>
-          <el-dropdown-item divided @click.native="logout" icon="el-icon-sunset">
+          <el-dropdown-item divided icon="el-icon-sunset" @click.native="logout">
             退出登录
           </el-dropdown-item>
         </el-dropdown-menu>

@@ -60,19 +60,19 @@ export const constantRoutes = [
     component: Layout,
     redirect: '/book/list',
     name: 'Book',
-    meta: {title: '图书管理', icon: 'el-icon-notebook-1'},
+    meta: { title: '图书管理', icon: 'el-icon-notebook-1' },
     children: [
       {
         path: 'list',
         name: 'BookList',
         component: () => import('@/views/book/index'),
-        meta: {title: '图书列表', icon: 'el-icon-notebook-2'}
+        meta: { title: '图书列表', icon: 'el-icon-notebook-2' }
       },
       {
         path: 'review',
         name: 'Review',
         component: () => import('@/views/book/review'),
-        meta: {title: '书评管理', icon: 'el-icon-s-comment'}
+        meta: { title: '书评管理', icon: 'el-icon-s-comment' }
       }
     ]
   },
@@ -82,20 +82,20 @@ export const constantRoutes = [
     component: Layout,
     redirect: '/user/userList',
     name: 'User',
-    meta: {title: '用户管理', icon: 'el-icon-s-custom'},
+    meta: { title: '用户管理', icon: 'el-icon-s-custom' },
     children: [
       {
         path: 'list',
         name: 'UserList',
         component: () => import('@/views/user/index'),
-        meta: {title: '用户列表', icon: 'el-icon-user-solid' }
+        meta: { title: '用户列表', icon: 'el-icon-user-solid' }
       },
       {
         path: 'info',
         name: 'UserInfo',
         component: () => import('@/views/user/info'),
-        meta: { title: '个人中心', icon: 'el-icon-brush'}
-      } ]
+        meta: { title: '个人中心', icon: 'el-icon-brush' }
+      }]
   },
 
   {
@@ -113,13 +113,13 @@ export const constantRoutes = [
         path: 'system',
         name: 'System',
         component: () => import('@/views/setting/system'),
-        meta: {title: '系统设置', icon: 'el-icon-s-tools'}
+        meta: { title: '系统设置', icon: 'el-icon-s-tools' }
       },
       {
         path: 'custom',
         name: 'Custom',
         component: () => import('@/views/setting/custom'),
-        meta: { title: '自定义设置', icon: 'el-icon-s-tools'}
+        meta: { title: '自定义设置', icon: 'el-icon-s-tools' }
       }
     ]
   },
@@ -127,11 +127,11 @@ export const constantRoutes = [
     path: '尤恩主页',
     component: Layout,
     hidden: false,
-    meta: {roles: ['admin']},
+    meta: { roles: ['admin'] },
     children: [
       {
         path: 'https://www.ewing.top',
-        meta: {title: '尤恩主页', icon: 'link'}
+        meta: { title: '尤恩主页', icon: 'link' }
       }
     ]
   },
