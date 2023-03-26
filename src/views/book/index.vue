@@ -101,7 +101,7 @@
       </el-table-column>
       <el-table-column label="出版日期" align="center" width="110">
         <template v-slot="scope">
-          <i v-if="scope.row.publish_date!=null" class="el-icon-time" />
+          <i v-if="scope.row.publishDate!=null" class="el-icon-time" />
           <span> {{ scope.row.publishDate }}</span>
         </template>
       </el-table-column>
@@ -117,7 +117,7 @@
         </template>
       </el-table-column>
       <!--行操作-->
-      <el-table-column label="操作" width="190" sortable prop="options" align="center">
+      <el-table-column label="操作" width="190" align="center">
         <template v-slot="scope">
           <el-button
             type="info"

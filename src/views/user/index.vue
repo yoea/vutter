@@ -62,9 +62,9 @@
 
     <!--表格区域-->
     <el-table
-      class="el-table-list"
       ref="handSelect_multipleTable"
       v-loading="listLoading"
+      class="el-table-list"
       :data="userList"
       element-loading-text="正在加载用户列表..."
       highlight-current-row
@@ -84,7 +84,7 @@
       <el-table-column label="头像" width="50" prop="avatar" align="center">
         <template v-slot:default="scope">
           <el-avatar :src="scope.row.avatar" @error="errorAvatarHandler">
-            <img src="https://yoea.github.io/facer/images/logo.png"/>
+            <img src="https://yoea.github.io/facer/images/logo.png">
           </el-avatar>
         </template>
       </el-table-column>
@@ -106,15 +106,15 @@
           <span @click="isCellShowPassword=true">********</span>
         </template>
       </el-table-column>
-      <el-table-column label="邮箱" align="center"  width="180" sortable="custom" :show-overflow-tooltip="true">
+      <el-table-column label="邮箱" align="center" width="160" sortable="custom" :show-overflow-tooltip="true">
         <template v-slot="scope">
           {{ scope.row.email }}
         </template>
       </el-table-column>
-      <el-table-column label="注册时间" align="center" sortable="custom" width="210">
+      <el-table-column label="注册时间" align="center" sortable="custom" width="145">
         <template v-slot="scope">
           <i v-if="scope.row.registered!=null" class="el-icon-time" />
-          <span> {{ scope.row.registered }}</span>
+          <span>{{ dateFormat(scope.row.registered,'YYYY-mm-dd HH:MM') }}</span>
         </template>
       </el-table-column>
       <el-table-column label="描述" align="center">
@@ -258,7 +258,7 @@
             </el-form-item>
           </el-tab-pane>
           <el-tab-pane label="高级设置" name="advancedSetting">
-            <el-form-item label="删除用户" label-width="80px" >
+            <el-form-item label="删除用户" label-width="80px">
               <el-switch
                 v-model="userForm.deleted"
                 active-text="删除"
@@ -294,6 +294,7 @@
 
 <script>
 import { listUser, updateOrSave, deleteUser, deleteBatchByIds } from '@/api/user'
+import { dateFormat } from '@/utils'
 
 export default {
   name: 'Index',
@@ -342,6 +343,7 @@ export default {
   },
 
   methods: {
+    dateFormat,
     handleBeforeClick(done) {
       this.$confirm('您所作的更改将全部丢失，确认关闭吗？', '内容尚未保存')
         .then(_ => {
@@ -350,7 +352,7 @@ export default {
         .catch(_ => {
         })
     },
-    fetchData() {
+    fetchData: function() {
       this.listLoading = true
       listUser(this.pageDTO).then(response => {
         this.userList = response.data.records
@@ -358,6 +360,7 @@ export default {
         this.pageDTO.pageSize = response.data.size
         this.userTotal = response.data.total
         this.listLoading = false
+        console.log(dateFormat(this.userList[3].registered, 'YYYY-mm-dd HH:MM'))
         // window.innerHeight 浏览器窗口的可见高度，减掉的是除了table最大高度的剩余空间
         this.maxTableHeight = window.innerHeight - 145
       })

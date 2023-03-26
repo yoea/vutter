@@ -1,6 +1,3 @@
-/**
- * Created by PanJiaChen on 16/11/18.
- */
 
 /**
  * Parse the time to string
@@ -114,4 +111,29 @@ export function param2Obj(url) {
     }
   })
   return obj
+}
+
+// {{dateFormat(scope.row.c_time,'YYYY-mm-dd HH:MM')}}
+export function dateFormat(date, cFormat) {
+  let ret = ''
+  date = new Date(date)
+  const opt = {
+    'Y+': date.getFullYear().toString(), // 年
+    'm+': (date.getMonth() + 1).toString(), // 月
+    'd+': date.getDate().toString(), // 日
+    'H+': date.getHours().toString(), // 时
+    'M+': date.getMinutes().toString(), // 分
+    'S+': date.getSeconds().toString() // 秒
+    // 有其他格式化字符需求可以继续添加，必须转化成字符串
+  }
+  for (const k in opt) {
+    ret = new RegExp('(' + k + ')').exec(cFormat)
+    if (ret) {
+      cFormat = cFormat.replace(
+        ret[1],
+        ret[1].length === 1 ? opt[k] : opt[k].padStart(ret[1].length, '0')
+      )
+    }
+  }
+  return cFormat
 }
