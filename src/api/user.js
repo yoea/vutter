@@ -3,7 +3,7 @@ import request from '@/utils/request'
 export function deleteBatchByIds(ids) {
   return request({
     url: '/user/delete/ids=' + ids,
-    method: 'post'
+    method: 'delete'
   })
 }
 
@@ -41,7 +41,7 @@ export function getInfo() {
 export function deleteById(params) {
   return request({
     url: '/user/delete',
-    method: 'get',
+    method: 'delete',
     params
   })
 }
